@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.time.ZonedDateTime;
 
 @Component
-public class Sheduler {
+public class Scheduler {
 
     @Autowired
     private Sender sender;

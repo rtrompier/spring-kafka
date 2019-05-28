@@ -1,6 +1,6 @@
 package ch.hcuge.kafka.scheduler;
 
-import ch.hcuge.kafka.model.Patient;
+import ch.hcuge.kafka.Patient;
 import ch.hcuge.kafka.sender.Sender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,10 +16,10 @@ public class Scheduler {
 
     @Scheduled(fixedDelay = 10000)
     void send() {
-        this.sender.send(Patient.builder()
-                .firstname("Remy")
-                .lastname("Trompier")
-                .birthdate(ZonedDateTime.now())
+        this.sender.send(Patient.newBuilder()
+                .setFirstname("Remy")
+                .setLastname("Trompier")
+//                .birthdate(ZonedDateTime.now())
                 .build());
     }
 }

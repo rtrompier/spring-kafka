@@ -1,6 +1,6 @@
 package ch.hcuge.kafka.sender;
 
-import ch.hcuge.kafka.model.Patient;
+import ch.hcuge.kafka.Patient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

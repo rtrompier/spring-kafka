@@ -16,9 +16,9 @@ public class Receiver {
         return latch;
     }
 
-    @KafkaListener(topics = "patient")
-    public void receive(String payload) {
-        LOGGER.info("received payload='{}'", payload);
-        latch.countDown();
-    }
+//    @KafkaListener(topics = "patient")
+//    public void receive(String payload) {
+//        LOGGER.info("received payload='{}'", payload);
+//        latch.countDown();
+//    }
 }

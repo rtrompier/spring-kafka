@@ -3,6 +3,8 @@ package ch.hcuge.kafka.receiver;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,16 +24,17 @@ public class ReceiverConfig {
     @Value("${kafka.bootstrap-servers}")
     private String bootstrapServers;
 
+    @Value("${kafka.schema-registry}")
+    private String schemaRegistry;
+
     @Bean
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         // list of host:port pairs used for establishing the initial connections to the Kafka cluster
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                bootstrapServers);
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                StringDeserializer.class);
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put("schema.registry.url", schemaRegistry);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getName());
         // allows a pool of processes to divide the work of consuming and processing records
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "helloworld");
         // automatically reset the offset to the earliest offset

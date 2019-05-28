@@ -1,0 +1,10 @@
+{
+     "type": "record",
+     "namespace": "ch.hcuge.kafka",
+     "name": "Patient",
+     "version": "1",
+     "fields": [
+       { "name": "firstname", "type": "string", "doc": "First Name of Patient" },
+       { "name": "lastname", "type": "string", "doc": "Last Name of Patient" }
+     ]
+}

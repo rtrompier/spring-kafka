@@ -1,4 +1,4 @@
-package ch.hcuge.kafka;
+package ch.hcuge.spring;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

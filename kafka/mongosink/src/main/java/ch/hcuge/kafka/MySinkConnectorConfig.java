@@ -1,4 +1,4 @@
-package ch.hcuge.kafka;
+package ch.hcuge.spring;
 
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;

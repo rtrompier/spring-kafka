@@ -7,55 +7,26 @@ Kafka connect tuto, assunming your IP address is 10.11.12.64
 First, launch the database container
 ```sh
 docker run -d \
-  --name=quickstart-mysql \
-  --net=host \
-  -e MYSQL_ROOT_PASSWORD=confluent \
-  -e MYSQL_USER=confluent \
-  -e MYSQL_PASSWORD=confluent \
-  -e MYSQL_DATABASE=connect_test \
-  mysql
+  --name postgres \
+  -p 5432:5432 \
+  -e POSTGRES_USER=root \
+  -e POSTGRES_PASSWORD=confluent \
+  -e POSTGRES_DB=patient \
+  postgres
 ```
 
-Next, Create databases and tables. You’ll need to exec into the Docker container to create the databases.
-
-```sh
-docker exec -it quickstart-mysql bash
-```
-On the bash prompt, create a MySQL shell
-
-```sh
-mysql -u confluent -pconfluent
-```
-
-Now, execute the following SQL statements:
+Next, Create databases and tables. You’ll need to execute the following SQL statements
 
 ```
-CREATE DATABASE IF NOT EXISTS connect_test;
-USE connect_test;
-
-DROP TABLE IF EXISTS test;
-
-
-CREATE TABLE IF NOT EXISTS test (
+DROP TABLE IF EXISTS patient;
+CREATE TABLE IF NOT EXISTS patient (
   id serial NOT NULL PRIMARY KEY,
-  name varchar(100),
-  email varchar(200),
-  department varchar(200),
-  modified timestamp default CURRENT_TIMESTAMP NOT NULL,
-  INDEX `modified_index` (`modified`)
+  firstname varchar(255),
+  lastname varchar(255),
+  modified timestamp default CURRENT_TIMESTAMP NOT NULL
 );
 
-INSERT INTO test (name, email, department) VALUES ('alice', 'alice@abc.com', 'engineering');
-INSERT INTO test (name, email, department) VALUES ('bob', 'bob@abc.com', 'sales');
-INSERT INTO test (name, email, department) VALUES ('bob', 'bob@abc.com', 'sales');
-INSERT INTO test (name, email, department) VALUES ('bob', 'bob@abc.com', 'sales');
-INSERT INTO test (name, email, department) VALUES ('bob', 'bob@abc.com', 'sales');
-INSERT INTO test (name, email, department) VALUES ('bob', 'bob@abc.com', 'sales');
-INSERT INTO test (name, email, department) VALUES ('bob', 'bob@abc.com', 'sales');
-INSERT INTO test (name, email, department) VALUES ('bob', 'bob@abc.com', 'sales');
-INSERT INTO test (name, email, department) VALUES ('bob', 'bob@abc.com', 'sales');
-INSERT INTO test (name, email, department) VALUES ('bob', 'bob@abc.com', 'sales');
-exit;
+INSERT INTO patient (firstname, lastname) VALUES ('remy', 'TROMPIER');
 ```
 
 # How to start
@@ -71,19 +42,26 @@ docker-compose up
 Go to Kafka Connect UI, and create a new JDBC Connector, by past the folowing configuration.
 ```json
 {
-	"name": "quickstart-jdbc-source",
-	"connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
-	"tasks.max": 1,
-	"connection.url": "jdbc:mysql://YOUR IP:3306/connect_test?user=root&password=confluent",
-	"mode": "incrementing",
-	"incrementing.column.name": "id",
-	"timestamp.column.name": "modified",
-	"topic.prefix": "quickstart-jdbc-",
-	"poll.interval.ms": 1000
+  "name": "patient-jdbc-source",
+  "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+  "tasks.max": 1,
+  "connection.url": "jdbc:postgresql://192.168.1.6:5432/patient?user=root&password=confluent",
+  "mode": "incrementing",
+  "incrementing.column.name": "id",
+  "timestamp.column.name": "modified",
+  "topic.prefix": "jdbc-",
+  "poll.interval.ms": 1000,
+  "transforms":"createKey,extractInt,addNamespace",
+  "transforms.createKey.type":"org.apache.kafka.connect.transforms.ValueToKey",
+  "transforms.createKey.fields":"id",
+  "transforms.extractInt.type":"org.apache.kafka.connect.transforms.ExtractField$Key",
+  "transforms.extractInt.field":"id",
+  "transforms.addNamespace.type":"org.apache.kafka.connect.transforms.SetSchemaMetadata$Value",
+  "transforms.addNamespace.schema.name": "ch.hcuge.kafka.Patient"
 }
 ```
 
-A new topic should be automatically created named `quickstart-jdbc-test`, and all the data of the table imported into this topic.
+A new topic should be automatically created named `jdbc-patient`, and all the data of the table imported into this topic.
 
 
 ###### UI
@@ -101,7 +79,7 @@ docker run \
   --net=host \
   --rm \
   confluentinc/cp-kafka:5.0.1 \
-  kafka-topics --delete --topic hug-user --zookeeper localhost:32181
+  kafka-topics --delete --topic hug-user --zookeeper localhost:2181
 ```
 
 {

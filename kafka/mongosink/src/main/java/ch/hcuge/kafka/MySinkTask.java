@@ -1,4 +1,4 @@
-package ch.hcuge.kafka;
+package ch.hcuge.spring;
 
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;

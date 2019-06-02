@@ -24,8 +24,8 @@ services:
     ports:
     - "2181:2181"
   kafka:
-    hostname: kafka
-    image: confluentinc/cp-enterprise-kafka:5.0.0
+    hostname: spring
+    image: confluentinc/cp-enterprise-spring:5.0.0
     links:
     - zookeeper
     ports:
@@ -55,7 +55,7 @@ services:
     ports:
     - "9021:9021"
     environment:
-      CONTROL_CENTER_BOOTSTRAP_SERVERS: "kafka:9092"
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: "spring:9092"
       CONTROL_CENTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
       CONTROL_CENTER_CONNECT_CLUSTER: 'connect:8083'
       CONTROL_CENTER_REPLICATION_FACTOR: 1

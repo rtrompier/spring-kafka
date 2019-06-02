@@ -1,4 +1,4 @@
-package ch.hcuge.kafka;
+package ch.hcuge.spring;
 
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
@@ -33,7 +33,7 @@ public class MySourceTask extends SourceTask {
 
   @Override
   public List<SourceRecord> poll() throws InterruptedException {
-    //TODO: Create SourceRecord objects that will be sent the kafka cluster.
+    //TODO: Create SourceRecord objects that will be sent the spring cluster.
     throw new UnsupportedOperationException("This has not been implemented.");
   }
 

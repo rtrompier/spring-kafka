@@ -1,4 +1,4 @@
-package ch.hcuge.kafka;
+package ch.hcuge.spring;
 
 import java.util.List;
 import java.util.Map;

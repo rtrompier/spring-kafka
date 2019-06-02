@@ -1,4 +1,4 @@
-package ch.hcuge.kafka;
+package ch.hcuge.spring;
 
 import com.github.jcustenborder.kafka.connect.utils.BaseDocumentationTest;
 

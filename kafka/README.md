@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS patient (
   modified timestamp default CURRENT_TIMESTAMP NOT NULL
 );
 
-INSERT INTO patient (firstname, lastname) VALUES ('remy', 'TROMPIER');
+INSERT INTO hcuge.patient (firstname, lastname) VALUES ('remy', 'TROMPIER');
 ```
 
 # How to start
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS patient (
   modified timestamp default CURRENT_TIMESTAMP NOT NULL
 );
 
-INSERT INTO patient (firstname, lastname) VALUES ('remy', 'TROMPIER');
+INSERT INTO hcuge.patient (firstname, lastname) VALUES ('remy', 'TROMPIER');
 ```
 
 
@@ -126,5 +126,5 @@ curl -i -X POST \
   -H "Accept:application/json" \
   -H "Content-Type:application/json" \
   localhost:8083/connectors/ \
-  -d '{ "name": "patient-connector", "config": { "connector.class": "io.debezium.connector.postgresql.PostgresConnector", "database.hostname": "192.168.1.28", "database.port": "5432", "database.user": "root", "database.password": "confluent", "database.dbname" : "patient", "database.server.name": "ch.hcuge.kafka", "schema.whitelist": "public", "table.whitelist": "patient", "database.history.kafka.bootstrap.servers": "kafka:9092", "database.history.kafka.topic": "dbhistory.patient" } }'
+  -d '{ "name": "patient-connector", "config": { "connector.class": "io.debezium.connector.postgresql.PostgresConnector", "database.hostname": "192.168.1.28", "database.port": "5432", "database.user": "root", "database.password": "confluent", "database.dbname" : "patient", "database.server.name": "ch.hcuge.kafka", "table.whitelist": "hcuge.patient", "database.history.kafka.bootstrap.servers": "kafka:9092", "database.history.kafka.topic": "dbhistory.patient" } }'
 ```

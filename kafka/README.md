@@ -18,6 +18,8 @@ docker run -d \
 Next, Create databases and tables. You’ll need to execute the following SQL statements
 
 ```
+ALTER SCHEMA public RENAME TO hcuge;
+
 DROP TABLE IF EXISTS patient;
 CREATE TABLE IF NOT EXISTS patient (
   id serial NOT NULL PRIMARY KEY,
@@ -82,19 +84,47 @@ docker run \
   kafka-topics --delete --topic hug-user --zookeeper localhost:2181
 ```
 
-{
-  "connector.class": "at.grahsl.kafka.connect.mongodb.MongoDbSinkConnector",
-  "key.converter": "io.confluent.connect.avro.AvroConverter",
-  "key.converter.schemas.enable": trues,
-  "key.converter.schema.registry.url": "http://schema-registry:8081/",
-  "mongodb.change.data.capture.handler": "at.grahsl.kafka.connect.mongodb.cdc.debezium.mongodb.MongoDbHandler",
-  "mongodb.collection": "kafka",
-  "mongodb.connection.uri": "mongodb://192.168.1.126:32768/test?w=1&journal=true",
-  "mongodb.document.id.strategy": "at.grahsl.kafka.connect.mongodb.processor.id.strategy.BsonOidStrategy",
-  "name": "output-mongo",
-  "tasks.max": 1,
-  "topics": "quickstart-jdbc-test",
-  "value.converter": "io.confluent.connect.avro.AvroConverter",
-  "value.converter.schemas.enable": true,
-  "value.converter.schema.registry.url": "http://schema-registry:8081/"
-}
+
+###### Stream DB with Debezium connector
+First, launch the custom Postgres database container
+```sh
+docker stop postgres && docker rm postgres
+docker run -d \
+  --name postgres \
+  -p 5432:5432 \
+  -e POSTGRES_USER=root \
+  -e POSTGRES_PASSWORD=confluent \
+  -e POSTGRES_DB=patient \
+  debezium/postgres
+```
+
+Next, Create databases and tables. You’ll need to execute the following SQL statements
+
+```
+ALTER SCHEMA public RENAME TO hcuge;
+
+DROP TABLE IF EXISTS patient;
+CREATE TABLE IF NOT EXISTS patient (
+  id serial NOT NULL PRIMARY KEY,
+  firstname varchar(255),
+  lastname varchar(255),
+  modified timestamp default CURRENT_TIMESTAMP NOT NULL
+);
+
+INSERT INTO patient (firstname, lastname) VALUES ('remy', 'TROMPIER');
+```
+
+
+
+Execute this statement : ALTER SYSTEM SET wal_level = 'logical';
+And restart postgres container. 
+
+Next, add the connector to Kafka connect : 
+
+```sh
+curl -i -X POST \
+  -H "Accept:application/json" \
+  -H "Content-Type:application/json" \
+  localhost:8083/connectors/ \
+  -d '{ "name": "patient-connector", "config": { "connector.class": "io.debezium.connector.postgresql.PostgresConnector", "database.hostname": "192.168.1.28", "database.port": "5432", "database.user": "root", "database.password": "confluent", "database.dbname" : "patient", "database.server.name": "ch.hcuge.kafka", "schema.whitelist": "public", "table.whitelist": "patient", "database.history.kafka.bootstrap.servers": "kafka:9092", "database.history.kafka.topic": "dbhistory.patient" } }'
+```

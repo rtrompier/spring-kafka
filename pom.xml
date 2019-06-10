@@ -16,6 +16,7 @@
 
     <properties>
         <java.version>11</java.version>
+        <schema-registry.url>http://localhost:8081</schema-registry.url>
     </properties>
 
     <dependencies>
@@ -91,14 +92,38 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>io.confluent</groupId>
+                <artifactId>kafka-schema-registry-maven-plugin</artifactId>
+                <version>5.1.0</version>
+                <configuration>
+                    <schemaRegistryUrls>
+                        <!--<param>${schema-registry.url}</param>-->
+                        <param>http://localhost:8081</param>
+                    </schemaRegistryUrls>
+                    <outputDirectory>src/main/resources/avro</outputDirectory>
+                    <subjectPatterns>
+                        <param>^ch.hcuge.kafka.hcuge.patient-(key|value)$</param>
+                    </subjectPatterns>
+                    <subjects></subjects>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
     <repositories>
         <repository>
             <id>confluent</id>
+            <name>Confluent</name>
             <url>http://packages.confluent.io/maven/</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>confluent</id>
+            <url>https://packages.confluent.io/maven/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>

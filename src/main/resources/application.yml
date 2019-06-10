@@ -15,4 +15,4 @@ spring.kafka:
 #    value-serializer: "io.confluent.spring.serializers.KafkaAvroSerializer"
 
 application:
-  topic: "jdbc-patient"
+  topic: "ch.hcuge.kafka.hcuge.patient"

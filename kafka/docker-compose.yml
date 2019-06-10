@@ -116,8 +116,7 @@ services:
       - schema-registry
       - kafka-rest-proxy
     volumes:
-      - /tmp/quickstart/file:/tmp/quickstart
-      - /tmp/quickstart/jars:/etc/kafka-connect/jars
+      - ./jars:/etc/kafka-connect/jars
 
   kafka-connect-ui:
     image: landoop/kafka-connect-ui:0.9.6

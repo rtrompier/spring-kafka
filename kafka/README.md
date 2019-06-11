@@ -1,9 +1,8 @@
 # Kafka connect
-Kafka connect tuto, assunming your IP address is 10.11.12.64
+Kafka connect tuto, assunming your IP address is 192.168.1.6
 
-# Requirements
 
-### Relational Database
+## Stream a Relational Database with JDBC Connector
 First, launch the database container
 ```sh
 docker run -d \
@@ -31,17 +30,21 @@ CREATE TABLE IF NOT EXISTS patient (
 INSERT INTO hcuge.patient (firstname, lastname) VALUES ('remy', 'TROMPIER');
 ```
 
-# How to start
-
-###### Start kafka stack
+### Start kafka stack
 ```sh
-git clone kafka-connect-repo
-cd kafka-connect
+cd kafka
 docker-compose up
 ```
 
-###### Create a new source connector, to stream DB table into a Kafka Topic
+UI Available : 
+ - Topics : http://localhost:8000
+ - Schema : http://localhost:8001
+ - Connector : http://localhost:8003/
+
+
+### Create a new source connector, to stream DB table into a Kafka Topic
 Go to Kafka Connect UI, and create a new JDBC Connector, by past the folowing configuration.
+
 ```json
 {
   "name": "patient-jdbc-source",
@@ -66,27 +69,12 @@ Go to Kafka Connect UI, and create a new JDBC Connector, by past the folowing co
 A new topic should be automatically created named `jdbc-patient`, and all the data of the table imported into this topic.
 
 
-###### UI
-Topics : http://localhost:8000
-Schema : http://localhost:8001
-Connector : http://localhost:8003/
+## Stream DB with Debezium connector
+Debezium is a distributed platform that turns your existing databases into event streams, so applications can see and respond immediately to each row-level change in the databases.
 
+First, launch the custom Postgres database container.
+See here why we use a custom DB : https://hub.docker.com/r/debezium/postgres
 
-
-
-
-###### To delete a topic 
-```
-docker run \
-  --net=host \
-  --rm \
-  confluentinc/cp-kafka:5.0.1 \
-  kafka-topics --delete --topic hug-user --zookeeper localhost:2181
-```
-
-
-###### Stream DB with Debezium connector
-First, launch the custom Postgres database container
 ```sh
 docker stop postgres && docker rm postgres
 docker run -d \
@@ -99,7 +87,7 @@ docker run -d \
 ```
 
 Next, Create databases and tables. You’ll need to execute the following SQL statements
-
+Public schema is renamed to avoid conflict with a 'public' package in java.
 ```
 ALTER SCHEMA public RENAME TO hcuge;
 
@@ -114,11 +102,6 @@ CREATE TABLE IF NOT EXISTS patient (
 INSERT INTO hcuge.patient (firstname, lastname) VALUES ('remy', 'TROMPIER');
 ```
 
-
-
-Execute this statement : ALTER SYSTEM SET wal_level = 'logical';
-And restart postgres container. 
-
 Next, add the connector to Kafka connect : 
 
 ```sh
@@ -126,5 +109,22 @@ curl -i -X POST \
   -H "Accept:application/json" \
   -H "Content-Type:application/json" \
   localhost:8083/connectors/ \
-  -d '{ "name": "patient-connector", "config": { "connector.class": "io.debezium.connector.postgresql.PostgresConnector", "database.hostname": "192.168.1.28", "database.port": "5432", "database.user": "root", "database.password": "confluent", "database.dbname" : "patient", "database.server.name": "ch.hcuge.kafka", "table.whitelist": "hcuge.patient", "database.history.kafka.bootstrap.servers": "kafka:9092", "database.history.kafka.topic": "dbhistory.patient" } }'
+  -d '{ "name": "patient-connector", "config": { "connector.class": "io.debezium.connector.postgresql.PostgresConnector", "database.hostname": "192.168.1.6", "database.port": "5432", "database.user": "root", "database.password": "confluent", "database.dbname" : "patient", "database.server.name": "ch.hcuge.kafka", "table.whitelist": "hcuge.patient", "database.history.kafka.bootstrap.servers": "kafka:9092", "database.history.kafka.topic": "dbhistory.patient" } }'
+```
+
+Next, start a java program to be notified when a row is added, updated, or deleted into the database.
+Udapte `schema-registry.url` properties inside the pom.xml, and `application.yml` file if necessary and execute :
+
+```sh
+mvn clean schema-registry:download generate-sources package -DskipTests
+java -jar target/kafka-0.0.1-SNAPSHOT.jar
+```
+
+## To delete a topic 
+```
+docker run \
+  --net=host \
+  --rm \
+  confluentinc/cp-kafka:5.0.1 \
+  kafka-topics --delete --topic jdbc-patient --zookeeper localhost:2181
 ```

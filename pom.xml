@@ -99,8 +99,7 @@
                 <version>5.1.0</version>
                 <configuration>
                     <schemaRegistryUrls>
-                        <!--<param>${schema-registry.url}</param>-->
-                        <param>http://localhost:8081</param>
+                        <param>${schema-registry.url}</param>
                     </schemaRegistryUrls>
                     <outputDirectory>src/main/resources/avro</outputDirectory>
                     <subjectPatterns>

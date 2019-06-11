@@ -120,6 +120,8 @@ mvn clean schema-registry:download generate-sources package -DskipTests
 java -jar target/kafka-0.0.1-SNAPSHOT.jar
 ```
 
+For information, `schema-registry:download generate-sources` will automatically download the Avro schema from the schema-registry, and generated the corresponding Java class.
+
 ## To delete a topic 
 ```
 docker run \

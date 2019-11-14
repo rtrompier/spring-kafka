@@ -30,6 +30,15 @@ CREATE TABLE IF NOT EXISTS patient (
 INSERT INTO hcuge.patient (firstname, lastname) VALUES ('remy', 'TROMPIER');
 ```
 
+You can simply run those commands with `docker exec` like this:
+```
+docker exec -it postgres psql -Uroot -a patient -c 'ALTER SCHEMA public RENAME TO hcuge;'
+docker exec -it postgres psql -Uroot -a patient -c 'DROP TABLE IF EXISTS patient;'
+docker exec -it postgres psql -Uroot -a patient -c 'CREATE TABLE IF NOT EXISTS hcuge.patient (id serial NOT NULL PRIMARY KEY,firstname varchar(255),lastname varchar(255),modified timestamp default CURRENT_TIMESTAMP NOT NULL);'
+docker exec -it postgres psql -Uroot -a patient -c "INSERT INTO hcuge.patient (firstname, lastname) VALUES ('remy', 'TROMPIER');"
+```
+
+
 ### Start kafka stack
 ```sh
 cd kafka

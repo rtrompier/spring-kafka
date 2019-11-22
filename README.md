@@ -139,3 +139,10 @@ docker run \
   confluentinc/cp-kafka:5.0.1 \
   kafka-topics --delete --topic jdbc-patient --zookeeper localhost:2181
 ```
+
+## To delete a Schema 
+```
+curl -X DELETE http://localhost:8081/subjects/[SCHEMA_NAME]
+```
+
+
